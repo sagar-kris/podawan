@@ -1,2 +1,7 @@
+numpy
+pandas
 quart
 quart-cors
+youtube-transcript-api
+pinecone-client
+sentence-transformers
