@@ -1,10 +1,9 @@
-import pinecone
+# import pinecone
 import os
 import json
 import re
-import numpy as np
-import pandas as pd
-from youtube_transcript_api import YouTubeTranscriptApi
+# import numpy as np
+# import pandas as pd
 from sentence_transformers import SentenceTransformer
 from sentence_transformers.util import cos_sim
 
@@ -21,9 +20,9 @@ model_max_seq_len = 384
 model_dimensions = 768
 index = pinecone.Index("youtube-transcripts")
 
-# index health
-def pinecone_index_health():
-  pinecone.init(api_key=PINECONE_API_KEY, environment=PINECONE_ENV)
-  pinecone.list_indexes()
-  index_stats_response = index.describe_index_stats()
-  return index_stats_response
+# # index health
+# def pinecone_index_health():
+#   pinecone.init(api_key=PINECONE_API_KEY, environment=PINECONE_ENV)
+#   pinecone.list_indexes()
+#   index_stats_response = index.describe_index_stats()
+#   return index_stats_response

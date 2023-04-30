@@ -1,9 +1,12 @@
+os
 numpy
-pandas
+# pandas
 quart
 quart-cors
 uvicorn
 mangum
 youtube-transcript-api
-pinecone-client
-sentence-transformers
+# pinecone-client
+# sentence-transformers
+tiktoken
+openai

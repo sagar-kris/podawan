@@ -2,7 +2,7 @@ import logging
 import json
 import re
 import numpy as np
-import pandas as pd
+# import pandas as pd
 
 import quart
 import quart_cors
@@ -12,8 +12,7 @@ from mangum import Mangum
 
 from youtube_transcript_api import YouTubeTranscriptApi
 
-from semantic_search import model, model_max_seq_len, index, pinecone_index_health
-from sentence_transformers import SentenceTransformer
+from semantic_search import model, model_max_seq_len, index
 from sentence_transformers.util import cos_sim
 
 logging.basicConfig(level=logging.DEBUG)
