@@ -7,10 +7,12 @@ import pandas as pd
 import quart
 import quart_cors
 from quart import request
+import uvicorn
+from mangum import Mangum
 
 from youtube_transcript_api import YouTubeTranscriptApi
 
-from semantic_search import model, model_max_seq_len
+from semantic_search import model, model_max_seq_len, index, pinecone_index_health
 from sentence_transformers import SentenceTransformer
 from sentence_transformers.util import cos_sim
 
@@ -47,7 +49,7 @@ async def openapi_spec():
     
 def getPodcastTranscript(podcast: str):
     podcast_id = podcast.split("=")[1]
-    transcript_json = YouTubeTranscriptApi.get_transcript(podcast_id, languages=['en', 'en-US'])
+    transcript_json = YouTubeTranscriptApi.get_transcript(podcast_id, languages=['en', 'en-US', 'es'])
     
     # return the text in the transcript
     transcript = []
@@ -112,8 +114,12 @@ def getPodcastData(podcast: str, prompt: str):
 
     return sentences_final
 
-def main():
-    app.run(debug=True, host="0.0.0.0", port=5003)
+handler = Mangum(app)
 
-if __name__ == "__main__":
-    main()
+# def main():
+#     # pinecone_index_health()
+#     # app.run(debug=True, host="0.0.0.0", port=5003)
+#     uvicorn.run("main:app", port=5000, log_level="info")
+
+# if __name__ == "__main__":
+#     main()
