@@ -2,8 +2,9 @@ numpy
 # pandas
 quart
 quart-cors
+gunicorn
 uvicorn
-mangum
+# mangum
 youtube-transcript-api
 # pinecone-client
 # sentence-transformers

@@ -18,7 +18,7 @@ PINECONE_ENV = os.environ.get('PINECONE_ENVIRONMENT') or 'PINECONE_ENVIRONMENT'
 model = SentenceTransformer('all-mpnet-base-v2')
 model_max_seq_len = 384
 model_dimensions = 768
-index = pinecone.Index("youtube-transcripts")
+# index = pinecone.Index("youtube-transcripts")
 
 # # index health
 # def pinecone_index_health():
