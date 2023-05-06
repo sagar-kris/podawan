@@ -53,7 +53,10 @@ def get_embedding(string_list: list[str]) -> list[list[float]]:
 # index health
 def pinecone_index_health():
     pinecone.init(api_key=PINECONE_API_KEY, environment=PINECONE_ENV)
-    index = pinecone.Index(pinecone.list_indexes()[0])
+    index_str = pinecone.list_indexes()[0]
+    logging.info(f'pinecone index: {index_str}')
+    index = pinecone.Index(index_str)
+    logging.info(f'pinecone index details: {index}')
     index_stats_response = index.describe_index_stats()
     logging.info(f'pinecone list_indexes(): {str(index_stats_response)}')
     return index_stats_response
