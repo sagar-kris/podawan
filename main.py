@@ -2,7 +2,7 @@ import logging
 import json
 import re
 import numpy as np
-# import pandas as pd
+import pandas as pd
 
 import quart
 import quart_cors
@@ -14,10 +14,8 @@ import gunicorn
 from youtube_transcript_api import YouTubeTranscriptApi
 
 # from semantic_search import model, model_max_seq_len, index, pinecone_index_health
-from semantic_search import model, model_max_seq_len
-from sentence_transformers.util import cos_sim
-
-logging.basicConfig(level=logging.DEBUG)
+from semantic_search import (model_max_seq_len, get_embedding, get_embedding_inner,
+                             pinecone_index_health, pinecone_upsert, pinecone_query)
 
 app = quart_cors.cors(quart.Quart(__name__), allow_origin="https://chat.openai.com")
 
@@ -25,8 +23,6 @@ app = quart_cors.cors(quart.Quart(__name__), allow_origin="https://chat.openai.c
 async def get_podcast():
     podcast = request.args.get('podcast')
     prompt = request.args.get('prompt')
-    logging.debug(f'arg podcast: {podcast}')
-    logging.debug(f'arg prompt: {prompt}')
     return quart.Response(response=json.dumps({"response": getPodcastData(podcast, prompt)}), status=200)
 
 @app.get("/logo.png")
@@ -48,8 +44,7 @@ async def openapi_spec():
         text = f.read()
         return quart.Response(text, mimetype="text/yaml")
     
-def getPodcastTranscript(podcast: str):
-    podcast_id = podcast.split("=")[1]
+def getPodcastTranscript(podcast_id: str) -> list[str]:
     transcript_json = YouTubeTranscriptApi.get_transcript(podcast_id, languages=['en', 'en-US', 'es'])
     
     # return the text in the transcript
@@ -93,34 +88,53 @@ def getPodcastTranscript(podcast: str):
 
     return transcript_final
 
-def getPodcastData(podcast: str, prompt: str):
-    sentences = getPodcastTranscript(podcast)
-    embeddings = model.encode(sentences)
+def getPodcastData(podcast: str, prompt: str) -> list[str]:
+    podcast_id = podcast.split("=")[1]
+    namespaces = list(pinecone_index_health()['namespaces'].keys())
 
-    # query_sentence = "what were the key insights for dating women"
-    query_embedding = model.encode(prompt)
+    sentences = getPodcastTranscript(podcast_id)
 
-    sim = np.zeros(len(sentences))
+    # create and upsert index
+    if podcast_id not in namespaces:
+        logging.info(f'creating new namespace')
+        embeddings = get_embedding(sentences)
 
-    for i in range(len(sentences)):
-        sim[i] = cos_sim(query_embedding, embeddings[i])
+        upsert_response = pinecone_upsert(embeddings, podcast_id)
+        logging.info(f'pinecone upsert response: {upsert_response}')
 
-    sorted_inds = np.argsort(sim)[::-1][:80] # take the 100 most relevant embeddings
-    sorted_inds = np.sort(sorted_inds)
-    logging.debug(f'number of sorted inds: {len(sorted_inds)}')
+    # retrieve top k similar chunks from pinecone index
+    # TODO: sort by chronological order using id
+    # TODO: get text strings from vector IDs
+    query_embedding = get_embedding_inner(prompt)
+    vectors_top_k = pinecone_query(query_embedding, podcast_id)['matches']
+    vectors_top_k.sort(key=lambda x: int(x['id']))
+    logging.info(f'query response sorted: {vectors_top_k}')
+    sentences_top_k = [sentences[int(vector['id'])] for vector in vectors_top_k]
+    sentences_top_k = ''.join(sentences_top_k)
+    logging.info(f'query response final: {sentences_top_k}')
 
-    sentences_final = []
-    for ind in sorted_inds:
-        sentences_final.append(sentences[ind])
+    return sentences_top_k
 
-    return sentences_final
+    # sim = np.zeros(len(sentences))
+
+    # for i in range(len(sentences)):
+    #     sim[i] = cos_sim(query_embedding, embeddings[i])
+
+    # sorted_inds = np.argsort(sim)[::-1][:80] # take the 100 most relevant embeddings
+    # sorted_inds = np.sort(sorted_inds)
+    # logging.info(f'number of sorted inds: {len(sorted_inds)}')
+
+    # sentences_final = []
+    # for ind in sorted_inds:
+    #     sentences_final.append(sentences[ind])
 
 # handler = Mangum(app)
 
-# def main():
-#     # pinecone_index_health()
-#     # app.run(debug=True, host="0.0.0.0", port=5003)
-#     uvicorn.run("main:app", port=5000, log_level="info")
+def main():
+    # pinecone_index_health()
+    # app.run(debug=True, host="0.0.0.0", port=5003)
+    logging.basicConfig(level=logging.INFO)
+    uvicorn.run("main:app", port=5003, log_level="debug")
 
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    main()
