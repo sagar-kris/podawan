@@ -8,5 +8,5 @@ uvicorn
 youtube-transcript-api
 # sentence-transformers
 tiktoken
-pinecone
+pinecone-client
 openai
