@@ -1,5 +1,5 @@
 numpy
-# pandas
+pandas
 quart
 quart-cors
 gunicorn
@@ -9,4 +9,5 @@ youtube-transcript-api
 # pinecone-client
 # sentence-transformers
 tiktoken
+pinecone
 openai
