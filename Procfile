@@ -1,1 +1,1 @@
-web: gunicorn -w 4 -t $TIMEOUT -b 0.0.0.0:$PORT -k uvicorn.workers.UvicornWorker main:app
+web: gunicorn -w 4 -t 600 -b 0.0.0.0:$PORT -k uvicorn.workers.UvicornWorker main:app
