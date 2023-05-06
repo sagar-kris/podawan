@@ -99,16 +99,20 @@ def getPodcastData(podcast: str, prompt: str) -> list[str]:
         logging.info(f'creating new namespace')
         embeddings = get_embedding(sentences)
 
-        upsert_response = pinecone_upsert(embeddings, podcast_id)
-        logging.info(f'pinecone upsert response: {upsert_response}')
+        logging.info(f'batching and upserting to pinecone')
+        num_batches = int(len(embeddings)/250) + 1
+        for i in range(num_batches):
+            embeddings_batch = embeddings[i*250:(i+1)*250]
+            upsert_response = pinecone_upsert(embeddings_batch, podcast_id)
+            logging.info(f'pinecone upsert response: {upsert_response}')
 
     # retrieve top k similar chunks from pinecone index
-    # TODO: sort by chronological order using id
-    # TODO: get text strings from vector IDs
     query_embedding = get_embedding_inner(prompt)
     vectors_top_k = pinecone_query(query_embedding, podcast_id)['matches']
+    # sort by chronological order using id
     vectors_top_k.sort(key=lambda x: int(x['id']))
     logging.info(f'query response sorted: {vectors_top_k}')
+    # get text strings from vector IDs
     sentences_top_k = [sentences[int(vector['id'])] for vector in vectors_top_k]
     sentences_top_k = ''.join(sentences_top_k)
     logging.info(f'query response final: {sentences_top_k}')
