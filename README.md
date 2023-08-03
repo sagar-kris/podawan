@@ -5,6 +5,10 @@ Get answers to your questions for any topics discussed in the episode.
 
 <img width="851" alt="Screen Shot 2023-08-03 at 12 20 39 AM" src="https://github.com/sagar-kris/podawan/assets/9098686/5b62b01a-281d-4e53-81ef-0de8a6203e45">
 
+## Architecture
+
+![Screen Shot 2023-07-29 at 8 40 00 PM](https://github.com/sagar-kris/podawan/assets/9098686/9adff299-0a1f-40bf-b5ca-691656a00fc8)
+
 ## Setup
 
 To install the required packages for this plugin, run the following command:
