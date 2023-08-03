@@ -1,6 +1,7 @@
 # Podcast Padawan
 
 Get a summarized explanation of any YouTube podcast and get responses to your questions for any topics discussed in the episode
+<img width="851" alt="Screen Shot 2023-08-03 at 12 20 39 AM" src="https://github.com/sagar-kris/podawan/assets/9098686/5b62b01a-281d-4e53-81ef-0de8a6203e45">
 
 ## Setup
 
