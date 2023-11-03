@@ -1,5 +1,8 @@
 # Podcast Padawan
 
+Podawan = Unleash a padawan on your podcasts
+(renamed from PodNug)
+
 Get a summarized explanation of any YouTube podcast episode.
 Get answers to your questions for any topics discussed in the episode.
 
